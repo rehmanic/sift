@@ -35,32 +35,32 @@ This project builds a Purchase Confidence Panel on the Product Details Page that
 ## 4. Technical Approach
 
 ### Frontend Structure
-- Next.js with App Router and TypeScript
-- Tailwind CSS for styling, shadcn/ui for accessible components
-- Context API for user preferences state
-- Pages: product listing (`/`) and product detail (`/products/[id]`)
+- Next.js (App Router) with TypeScript and Tailwind CSS
+- shadcn/ui components for clean UI elements
+- React Context API for managing user preferences state
+- Pages: Product catalog listing (`/`) and Product Details Page (`/products/[id]`)
 
 ### Backend / API Structure
-- Express.js with TypeScript, running on port 3001
-- RESTful routes: `/api/products`, `/api/products/:id`, `/api/products/:id/confidence`, `/api/products/:id/alternatives`
-- Service layer handles confidence calculation and alternative matching
-- CORS enabled for frontend communication
+- Express.js with TypeScript running on port 3001
+- REST endpoints: `/api/products`, `/api/products/:id`, `/api/products/:id/confidence`, `/api/products/:id/alternatives`
+- Service-based architecture separating routing, confidence calculation, and alternative recommendation logic
+- CORS configured for frontend communication
 
 ### Data Model
-- `products.json` — id, name, description, category, brandId, basePrice, variants (size, color, stock, measurements)
-- `brands.json` — id, name, deliveryStats (totalOrders, onTimeOrders, avgDeliveryDays)
-- `users.json` — id, preferences (sizes, payment type, delivery type)
+- `products.json`: Product metadata, categories, brand ID, pricing, and variants with physical measurements
+- `brands.json`: Brand details and delivery performance metrics (total orders, on-time rate, average delivery days)
+- `users.json`: User profile and size/payment/delivery preferences
 
 ### Key Technical Decisions
-- JSON files loaded into memory at startup — no database, no ORM, zero config
-- Confidence data served from a separate endpoint so product detail stays cacheable
-- Measurements (cm) used for cross-brand size matching instead of relying on label names
-- Alternatives computed server-side where stock, price, and delivery data is available
+- Memory-cached JSON data for zero-config local execution
+- Decoupled confidence calculation endpoint to keep core product details cacheable
+- Physical measurements (cm) for accurate cross-brand size matching rather than raw size labels
+- Server-side alternative generation where stock, price, and delivery data are computed together
 
 ### Important Assumptions
-- Single mock user, no authentication required
-- All data is static and loaded at server startup
-- Prices are in PKR (Pakistani Rupees)
+- Single user context without authentication requirements
+- Prices formatted in PKR (Pakistani Rupees)
+- Static dataset loaded at server startup
 
 ## 5. How to Run
 
@@ -86,28 +86,29 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 6. Tests
 
-<!-- Fill after implementation -->
-
-- **Tests Added:**
-- **Test Priorities:**
+- **Testing Strategy**: Manual end-to-end black-box testing was conducted across key user journeys (catalog filtering, PDP confidence scoring, user preference updates, and alternative product recommendations).
+- **Rationale**: As a Proof of Concept (PoC) designed to validate user decision confidence and UX patterns, black-box testing was prioritized for rapid iteration over building unit test infrastructure.
+- **Priority Test Focus**: If implementing automated tests next, initial priority would be unit testing backend business logic in `productService.ts` (cross-brand size measurement matching, stacked pricing calculations, and alternative recommendation filtering) to prevent core scoring regressions.
 
 ## 7. Tradeoffs
 
-<!-- Fill after implementation -->
-
--
+- **In-Memory JSON Data**: Selected for zero setup friction during evaluation instead of setting up a database.
+- **Static Mock Data**: Used static inventory and delivery statistics instead of live seller API integrations.
+- **Single Mock User**: Focused effort on core confidence scoring features rather than user auth and session handling.
+- **Desktop-First Priority**: Optimized UI for desktop PDP views within the project time box.
 
 ## 8. Future Improvements
 
-<!-- Fill after implementation -->
-
--
+- **Database & ORM**: Migrate JSON files to PostgreSQL or MongoDB with Prisma/Drizzle.
+- **User Authentication**: Implement multi-user auth and persistent profile management.
+- **Real-Time Inventory**: Connect live webhooks for stock updates and seller delivery metrics.
+- **Notification Services**: Implement email and SMS alerts for "Notify Me" requests.
+- **Mobile Responsiveness**: Complete mobile-optimized layouts for all screens.
 
 ## 9. AI Usage
 
-<!-- Fill after implementation -->
-
-- **AI Tools Used:**
-- **What AI Helped Generate / Reason Through:**
-- **What Was Manually Reviewed / Changed:**
-- **Example of AI Output Correction / Rejection:**
+- **Tool Used**: Google's Antigravity-IDE.
+- **What AI Helped Generate**: AI generated initial project scaffolding, directory layout, and boilerplate component structures to save setup time.
+- **What Was Manually Done**: Requirements analysis and solution brainstorming were performed 100% manually (documented in `BRAINSTORM.md`). All AI-generated code was reviewed, refactored, and tested manually.
+- **Correction / Rejection Example**: The initial AI boilerplate proposed an over-engineered enterprise architecture with superfluous abstraction layers. I rejected the extra boilerplate and refactored it into a clean, single-tier Express service architecture.
+- **Audit Trail**: Recorded automatically by Antigravity-IDE transcript logs (`.system_generated/logs/transcript.jsonl`).
