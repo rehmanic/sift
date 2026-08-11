@@ -43,11 +43,25 @@
 
 ## 5. How to Run
 
-<!-- Include clear instructions to run the project locally. -->
+### Prerequisites
+- Node.js v18+
+- npm
 
+### Backend (Express — port 3001)
 ```bash
-
+cd be
+npm install
+npm run dev
 ```
+
+### Frontend (Next.js — port 3000)
+```bash
+cd fe
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 6. Tests
 
