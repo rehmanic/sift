@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "Sift — LAAM Purchase Confidence",
   description:
     "Make confident purchase decisions on LAAM. Check availability, pricing, delivery, and alternatives at a glance.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

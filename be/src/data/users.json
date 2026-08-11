@@ -3,11 +3,23 @@
     "id": "u1",
     "name": "Ayesha Khan",
     "preferences": {
-      "sizeLabel": "S",
-      "measurements": { "chest": 91, "length": 99 },
+      "westernSize": {
+        "sizeLabel": "S",
+        "chest": 34,
+        "waist": 28,
+        "hip": 36,
+        "shoulder": 14.5
+      },
+      "easternSize": {
+        "sizeLabel": "S",
+        "kameezLength": 39,
+        "chest": 36,
+        "shoulder": 14,
+        "sleeveLength": 21.5,
+        "trouserLength": 38
+      },
       "paymentType": "card",
-      "deliveryType": "standard",
-      "budgetMax": 6000
+      "deliveryType": "standard"
     }
   }
 ]

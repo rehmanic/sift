@@ -51,8 +51,8 @@ export default function ConfidenceSignals({ confidence }: { confidence: Confiden
         <CreditCard className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">You Pay</p>
-            <p className="text-base font-semibold">Rs. {pricing.total.toLocaleString()}</p>
+            <p className="text-sm font-semibold">You Pay</p>
+            <p className="text-xl font-extrabold text-emerald-700">Rs. {pricing.total.toLocaleString()}</p>
           </div>
           <button
             onClick={() => setShowBreakdown(!showBreakdown)}
@@ -104,9 +104,10 @@ export default function ConfidenceSignals({ confidence }: { confidence: Confiden
           <p className="text-sm text-muted-foreground mt-0.5">
             {delivery.orderByMessage}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            On-time delivery rate: {delivery.onTimeRate}%
-          </p>
+          <div className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-md shadow-xs">
+            <span>On-time delivery rate:</span>
+            <span className="font-extrabold text-emerald-950">{delivery.onTimeRate}%</span>
+          </div>
         </div>
       </div>
     </div>

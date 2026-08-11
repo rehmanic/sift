@@ -41,17 +41,23 @@ export function getCategories(): string[] {
 }
 
 function findBestVariant(product: Product, user: User): Variant {
-  const { measurements } = user.preferences;
+  const cat = (product.category || "").toLowerCase();
+  const isEastern = cat.includes("kurta") || cat.includes("shalwar") || cat.includes("suit") || cat.includes("unstitched") || cat.includes("stitched");
+  const sizePrefs = isEastern ? user.preferences?.easternSize : user.preferences?.westernSize;
 
-  // Find the variant whose measurements are closest to the user's
+  if (!sizePrefs) return product.variants[0];
+
   let bestMatch = product.variants[0];
   let bestDiff = Infinity;
 
+  const targetChest = sizePrefs.chest || 36;
+  const targetLength = isEastern
+    ? (sizePrefs as any).kameezLength || 38
+    : sizePrefs.chest || 36;
+
   for (const variant of product.variants) {
-    const chestDiff = Math.abs(variant.measurements.chest - measurements.chest);
-    const lengthDiff = Math.abs(
-      variant.measurements.length - measurements.length
-    );
+    const chestDiff = Math.abs(variant.measurements.chest - targetChest);
+    const lengthDiff = Math.abs(variant.measurements.length - targetLength);
     const totalDiff = chestDiff + lengthDiff;
 
     if (totalDiff < bestDiff) {
@@ -189,10 +195,8 @@ export function getConfidence(
     restockDate: variant.restockDate,
   };
 
-  const overBudget = pricing.total > user.preferences.budgetMax;
   const showAlternatives =
     status === "out_of_stock" ||
-    overBudget ||
     delivery.badge === "frequently_delayed";
 
   const summary = buildSummary(

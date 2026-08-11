@@ -1,84 +1,134 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
 import type { Product, Brand } from "@/types/types";
-import { getProducts, getCategories, getBrand } from "@/lib/api";
-import { usePreferences } from "@/lib/UserPreferencesContext";
+import { getProducts, getBrand } from "@/lib/api";
+import HeaderNav from "@/components/HeaderNav";
 import ProductCard from "@/components/ProductCard";
-import PreferencesDialog from "@/components/PreferencesDialog";
-import { Button } from "@/components/ui/button";
+import PriceFilterDropdown from "@/components/PriceFilterDropdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
+import { ChevronDown } from "lucide-react";
 
 export default function Home() {
-  const { user } = usePreferences();
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Record<string, Brand>>({});
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedBrand, setSelectedBrand] = useState<string>("");
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 15000]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
-
-  useEffect(() => {
     setLoading(true);
-    getProducts({
-      category: selectedCategory || undefined,
-      minPrice: priceRange[0] || undefined,
-      maxPrice: priceRange[1] < 15000 ? priceRange[1] : undefined,
-    })
+    getProducts()
       .then(async (prods) => {
         setProducts(prods);
         const uniqueBrandIds = [...new Set(prods.map((p) => p.brandId))];
         const brandResults = await Promise.all(uniqueBrandIds.map(getBrand));
         const brandMap: Record<string, Brand> = {};
-        brandResults.forEach((b) => { brandMap[b.id] = b; });
+        brandResults.forEach((b) => {
+          brandMap[b.id] = b;
+        });
         setBrands(brandMap);
       })
       .finally(() => setLoading(false));
-  }, [selectedCategory, priceRange]);
+  }, []);
+
+  const categories = [
+    "Shalwar Kameez",
+    "Kurta set",
+    "Sherwani",
+    "Prince coat",
+    "Unstitched",
+    "Kurta",
+    "Shalwar",
+    "Trousers",
+  ];
+
+  // Dynamically extract colors from products
+  const availableColors = useMemo(() => {
+    const colors = new Set<string>();
+    products.forEach((p) => {
+      p.variants.forEach((v) => {
+        if (v.color) colors.add(v.color);
+      });
+    });
+    return Array.from(colors);
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      // Category filter
+      if (
+        selectedCategory &&
+        !p.category.toLowerCase().includes(selectedCategory.toLowerCase()) &&
+        !selectedCategory.toLowerCase().includes(p.category.toLowerCase())
+      ) {
+        return false;
+      }
+      // Brand filter
+      if (selectedBrand && p.brandId !== selectedBrand) {
+        return false;
+      }
+      // Size filter
+      if (
+        selectedSize &&
+        !p.variants.some((v) => v.size === selectedSize && (inStockOnly ? v.stock > 0 : true))
+      ) {
+        return false;
+      }
+      // Color filter
+      if (
+        selectedColor &&
+        !p.variants.some((v) => v.color.toLowerCase() === selectedColor.toLowerCase())
+      ) {
+        return false;
+      }
+      // In-stock filter
+      if (inStockOnly && !p.variants.some((v) => v.stock > 0)) {
+        return false;
+      }
+      // Price filter
+      let finalPrice = p.basePrice;
+      if (p.discounts && p.discounts.length > 0) {
+        for (const d of p.discounts) {
+          finalPrice -= d.type === "percentage" ? Math.round(finalPrice * (d.value / 100)) : d.value;
+        }
+      }
+      if (finalPrice < priceRange[0] || finalPrice > priceRange[1]) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, selectedCategory, selectedBrand, selectedSize, selectedColor, inStockOnly, priceRange]);
 
   return (
-    <div className="flex flex-col min-h-full">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-14">
-          <h1 className="text-lg font-semibold tracking-tight">Sift</h1>
-          <div className="flex items-center gap-3">
-            {user && (
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                {user.name} · Size {user.preferences.sizeLabel}
-              </span>
-            )}
-            <PreferencesDialog>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Settings className="h-3.5 w-3.5" />
-                Preferences
-              </Button>
-            </PreferencesDialog>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <HeaderNav />
 
-      <main className="mx-auto max-w-6xl w-full flex-1 px-6 py-8">
-        <div className="space-y-1 mb-8">
-          <h2 className="text-2xl font-semibold tracking-tight">Discover</h2>
-          <p className="text-muted-foreground">
-            South Asian fashion — curated for confidence.
+      {/* Main Container - No Sidebar */}
+      <main className="mx-auto max-w-7xl w-full flex-1 px-4 sm:px-6 py-6 space-y-6">
+        {/* Title and Count */}
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Men&apos;s Collection
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+            {filteredProducts.length.toLocaleString()} Items
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 mb-6">
+        {/* Categories Pills: Shalwar Kameez, Kurta set, Sherwani, Prince coat, Unstitched, Kurta, Shalwar, Trousers */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           <button
             onClick={() => setSelectedCategory("")}
-            className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors border ${
               selectedCategory === ""
-                ? "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-muted/50 border-border text-foreground hover:bg-muted"
             }`}
           >
             All
@@ -86,64 +136,123 @@ export default function Home() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              onClick={() => setSelectedCategory(selectedCategory === cat ? "" : cat)}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors border ${
                 selectedCategory === cat
-                  ? "bg-foreground text-background"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? "bg-foreground text-background border-foreground"
+                  : "bg-muted/50 border-border text-foreground hover:bg-muted"
               }`}
             >
               {cat}
             </button>
           ))}
+        </div>
 
-          <Separator orientation="vertical" className="h-6 mx-2" />
-
-          <div className="flex items-center gap-3 min-w-[200px]">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              Rs. {priceRange[0].toLocaleString()} – {priceRange[1].toLocaleString()}
-            </span>
-            <Slider
-              value={priceRange}
-              onValueChange={(v) => setPriceRange(v as [number, number])}
-              min={0}
-              max={15000}
-              step={500}
-              className="w-40"
+        {/* Explicit Filter Row: In-stock, Price, Size, Brand, Color */}
+        <div className="flex flex-wrap items-center gap-3 py-3 border-y border-border text-xs">
+          {/* 1. In-stock Filter */}
+          <label className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5 cursor-pointer hover:bg-muted transition-colors">
+            <span className="font-semibold text-foreground">In-stock</span>
+            <input
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={(e) => setInStockOnly(e.target.checked)}
+              className="accent-foreground rounded cursor-pointer h-3.5 w-3.5"
             />
+          </label>
+
+          {/* 2. Price Filter Popover */}
+          <PriceFilterDropdown
+            priceRange={priceRange}
+            onApply={setPriceRange}
+            maxPriceLimit={15000}
+          />
+
+          {/* 3. Size Filter */}
+          <div className="relative inline-block">
+            <select
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
+            >
+              <option value="">Size: All</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
+          </div>
+
+          {/* 4. Brand Filter */}
+          <div className="relative inline-block">
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
+            >
+              <option value="">Brand: All</option>
+              {Object.values(brands).map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
+          </div>
+
+          {/* 5. Color Filter */}
+          <div className="relative inline-block">
+            <select
+              value={selectedColor}
+              onChange={(e) => setSelectedColor(e.target.value)}
+              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
+            >
+              <option value="">Color: All</option>
+              {availableColors.map((col) => (
+                <option key={col} value={col}>
+                  {col}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
           </div>
         </div>
 
+        {/* Product Grid */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-3">
-                <Skeleton className="aspect-[3/4] rounded-xl" />
+                <Skeleton className="aspect-[3/4] rounded-lg" />
                 <Skeleton className="h-4 w-2/3" />
                 <Skeleton className="h-4 w-1/2" />
               </div>
             ))}
           </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">
-            <p className="text-lg">No products found</p>
-            <p className="text-sm mt-1">Try adjusting your filters.</p>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-20 border border-dashed border-border rounded-xl">
+            <p className="text-base font-semibold text-foreground">No matching products found</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Try adjusting your selected filters or price range.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
-                brandName={brands[product.brandId]?.name ?? ""}
+                brandName={brands[product.brandId]?.name ?? "LAAM"}
               />
             ))}
           </div>
         )}
       </main>
 
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Sift by LAAM — Purchase with confidence
+      <footer className="border-t border-border mt-12 py-6 text-center text-xs text-muted-foreground">
+        © 2026 LAAM Sift — Purchase Confidence Engine
       </footer>
     </div>
   );

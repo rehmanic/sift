@@ -44,12 +44,28 @@ export interface Brand {
   deliveryStats: DeliveryStats;
 }
 
+export interface WesternSizePreferences {
+  sizeLabel?: string;
+  chest: number;
+  waist: number;
+  hip: number;
+  shoulder: number;
+}
+
+export interface EasternSizePreferences {
+  sizeLabel?: string;
+  kameezLength: number;
+  chest: number;
+  shoulder: number;
+  sleeveLength: number;
+  trouserLength: number;
+}
+
 export interface UserPreferences {
-  sizeLabel: string;
-  measurements: Measurements;
+  westernSize: WesternSizePreferences;
+  easternSize: EasternSizePreferences;
   paymentType: "card" | "cash" | "ewallet";
   deliveryType: "standard" | "instant";
-  budgetMax: number;
 }
 
 export interface User {
