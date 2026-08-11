@@ -31,17 +31,15 @@ export interface Product {
   variants: Variant[];
 }
 
-export interface DeliveryStats {
-  totalOrders: number;
-  onTimeOrders: number;
-  avgDeliveryDays: number;
-  cutoffHour: number;
-}
-
 export interface Brand {
   id: string;
   name: string;
-  deliveryStats: DeliveryStats;
+  deliveryStats: {
+    totalOrders: number;
+    onTimeOrders: number;
+    avgDeliveryDays: number;
+    cutoffHour: number;
+  };
 }
 
 export interface UserPreferences {
@@ -59,6 +57,7 @@ export interface User {
 }
 
 export type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
+export type DeliveryBadge = "highly_reliable" | "usually_on_time" | "frequently_delayed";
 
 export interface PriceBreakdown {
   basePrice: number;
@@ -68,8 +67,6 @@ export interface PriceBreakdown {
   tax: number;
   total: number;
 }
-
-export type DeliveryBadge = "highly_reliable" | "usually_on_time" | "frequently_delayed";
 
 export interface ConfidenceResponse {
   availability: {

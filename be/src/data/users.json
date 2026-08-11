@@ -1,0 +1,13 @@
+[
+  {
+    "id": "u1",
+    "name": "Ayesha Khan",
+    "preferences": {
+      "sizeLabel": "S",
+      "measurements": { "chest": 91, "length": 99 },
+      "paymentType": "card",
+      "deliveryType": "standard",
+      "budgetMax": 6000
+    }
+  }
+]

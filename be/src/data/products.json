@@ -1,0 +1,153 @@
+[
+  {
+    "id": "p1",
+    "name": "Emerald Embroidered Lawn Kurta",
+    "description": "Premium lawn fabric with intricate emerald thread embroidery on neckline and sleeves. Lightweight and breathable, perfect for summer occasions.",
+    "category": "Lawn Kurta",
+    "brandId": "b1",
+    "basePrice": 5000,
+    "images": ["/images/lawn-kurta-emerald.jpg"],
+    "discounts": [
+      { "type": "percentage", "value": 10, "label": "Summer Sale" }
+    ],
+    "shippingCost": 200,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "XS", "color": "Emerald", "stock": 3, "restockDate": null, "measurements": { "chest": 86, "length": 96 } },
+      { "size": "S", "color": "Emerald", "stock": 8, "restockDate": null, "measurements": { "chest": 91, "length": 99 } },
+      { "size": "M", "color": "Emerald", "stock": 0, "restockDate": "2026-09-01", "measurements": { "chest": 96, "length": 102 } },
+      { "size": "L", "color": "Emerald", "stock": 12, "restockDate": null, "measurements": { "chest": 101, "length": 105 } },
+      { "size": "XL", "color": "Emerald", "stock": 2, "restockDate": null, "measurements": { "chest": 106, "length": 108 } }
+    ]
+  },
+  {
+    "id": "p2",
+    "name": "Rose Gold Chiffon Dupatta",
+    "description": "Delicate chiffon dupatta with rose gold foil print and hand-finished scalloped edges. Pairs beautifully with solid kurtas.",
+    "category": "Chiffon Dupatta",
+    "brandId": "b2",
+    "basePrice": 2800,
+    "images": ["/images/chiffon-dupatta-rose.jpg"],
+    "discounts": [],
+    "shippingCost": 150,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "Free Size", "color": "Rose Gold", "stock": 15, "restockDate": null, "measurements": { "chest": 0, "length": 250 } }
+    ]
+  },
+  {
+    "id": "p3",
+    "name": "Midnight Blue Silk Kurta",
+    "description": "Pure silk kurta in midnight blue with subtle geometric self-print. Ideal for formal events and evening wear.",
+    "category": "Silk Kurta",
+    "brandId": "b3",
+    "basePrice": 8500,
+    "images": ["/images/silk-kurta-blue.jpg"],
+    "discounts": [
+      { "type": "percentage", "value": 15, "label": "Eid Collection" }
+    ],
+    "shippingCost": 0,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "S", "color": "Midnight Blue", "stock": 4, "restockDate": null, "measurements": { "chest": 90, "length": 100 } },
+      { "size": "M", "color": "Midnight Blue", "stock": 6, "restockDate": null, "measurements": { "chest": 95, "length": 103 } },
+      { "size": "L", "color": "Midnight Blue", "stock": 0, "restockDate": "2026-08-20", "measurements": { "chest": 100, "length": 106 } },
+      { "size": "XL", "color": "Midnight Blue", "stock": 1, "restockDate": null, "measurements": { "chest": 105, "length": 109 } }
+    ]
+  },
+  {
+    "id": "p4",
+    "name": "Ivory Cotton Lawn Kurta",
+    "description": "Minimalist ivory lawn kurta with pin-tuck detailing and mother-of-pearl buttons. A wardrobe essential for everyday elegance.",
+    "category": "Lawn Kurta",
+    "brandId": "b2",
+    "basePrice": 3500,
+    "images": ["/images/lawn-kurta-ivory.jpg"],
+    "discounts": [
+      { "type": "fixed", "value": 300, "label": "New Arrival Discount" }
+    ],
+    "shippingCost": 200,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "XS", "color": "Ivory", "stock": 0, "restockDate": null, "measurements": { "chest": 85, "length": 95 } },
+      { "size": "S", "color": "Ivory", "stock": 10, "restockDate": null, "measurements": { "chest": 90, "length": 98 } },
+      { "size": "M", "color": "Ivory", "stock": 7, "restockDate": null, "measurements": { "chest": 95, "length": 101 } },
+      { "size": "L", "color": "Ivory", "stock": 5, "restockDate": null, "measurements": { "chest": 100, "length": 104 } }
+    ]
+  },
+  {
+    "id": "p5",
+    "name": "Dusty Pink Lawn Kurta",
+    "description": "Soft dusty pink lawn kurta with delicate lace trim and mirror work accents. Feminine and contemporary design.",
+    "category": "Lawn Kurta",
+    "brandId": "b4",
+    "basePrice": 4200,
+    "images": ["/images/lawn-kurta-pink.jpg"],
+    "discounts": [
+      { "type": "percentage", "value": 5, "label": "Loyalty Discount" }
+    ],
+    "shippingCost": 250,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "S", "color": "Dusty Pink", "stock": 0, "restockDate": "2026-09-15", "measurements": { "chest": 89, "length": 97 } },
+      { "size": "M", "color": "Dusty Pink", "stock": 3, "restockDate": null, "measurements": { "chest": 94, "length": 100 } },
+      { "size": "L", "color": "Dusty Pink", "stock": 9, "restockDate": null, "measurements": { "chest": 99, "length": 103 } },
+      { "size": "XL", "color": "Dusty Pink", "stock": 0, "restockDate": null, "measurements": { "chest": 104, "length": 106 } }
+    ]
+  },
+  {
+    "id": "p6",
+    "name": "Sage Green Silk Kurta",
+    "description": "Handwoven silk kurta in sage green with traditional motif embroidery. Rich texture with a modern silhouette.",
+    "category": "Silk Kurta",
+    "brandId": "b1",
+    "basePrice": 9200,
+    "images": ["/images/silk-kurta-sage.jpg"],
+    "discounts": [],
+    "shippingCost": 0,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "S", "color": "Sage Green", "stock": 2, "restockDate": null, "measurements": { "chest": 91, "length": 99 } },
+      { "size": "M", "color": "Sage Green", "stock": 5, "restockDate": null, "measurements": { "chest": 96, "length": 102 } },
+      { "size": "L", "color": "Sage Green", "stock": 4, "restockDate": null, "measurements": { "chest": 101, "length": 105 } }
+    ]
+  },
+  {
+    "id": "p7",
+    "name": "Pearl White Chiffon Dupatta",
+    "description": "Ethereal pearl white chiffon dupatta with sequin border and embroidered motifs. A statement piece for festive wear.",
+    "category": "Chiffon Dupatta",
+    "brandId": "b3",
+    "basePrice": 3200,
+    "images": ["/images/chiffon-dupatta-pearl.jpg"],
+    "discounts": [
+      { "type": "percentage", "value": 20, "label": "Clearance" }
+    ],
+    "shippingCost": 150,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "Free Size", "color": "Pearl White", "stock": 20, "restockDate": null, "measurements": { "chest": 0, "length": 250 } }
+    ]
+  },
+  {
+    "id": "p8",
+    "name": "Burgundy Embroidered Lawn Kurta",
+    "description": "Rich burgundy lawn kurta featuring Kashmiri-inspired aari embroidery. Bold color with intricate craftsmanship.",
+    "category": "Lawn Kurta",
+    "brandId": "b3",
+    "basePrice": 5800,
+    "images": ["/images/lawn-kurta-burgundy.jpg"],
+    "discounts": [
+      { "type": "percentage", "value": 10, "label": "Summer Sale" },
+      { "type": "fixed", "value": 200, "label": "App Exclusive" }
+    ],
+    "shippingCost": 200,
+    "taxRate": 0.05,
+    "variants": [
+      { "size": "S", "color": "Burgundy", "stock": 6, "restockDate": null, "measurements": { "chest": 90, "length": 100 } },
+      { "size": "M", "color": "Burgundy", "stock": 11, "restockDate": null, "measurements": { "chest": 95, "length": 103 } },
+      { "size": "L", "color": "Burgundy", "stock": 4, "restockDate": null, "measurements": { "chest": 100, "length": 106 } },
+      { "size": "XL", "color": "Burgundy", "stock": 0, "restockDate": "2026-08-25", "measurements": { "chest": 105, "length": 109 } }
+    ]
+  }
+]

@@ -1,1 +1,42 @@
-{}
+[
+  {
+    "id": "b1",
+    "name": "Khaadi",
+    "deliveryStats": {
+      "totalOrders": 12500,
+      "onTimeOrders": 12125,
+      "avgDeliveryDays": 3,
+      "cutoffHour": 23
+    }
+  },
+  {
+    "id": "b2",
+    "name": "Gul Ahmed",
+    "deliveryStats": {
+      "totalOrders": 9800,
+      "onTimeOrders": 8820,
+      "avgDeliveryDays": 4,
+      "cutoffHour": 20
+    }
+  },
+  {
+    "id": "b3",
+    "name": "Sana Safinaz",
+    "deliveryStats": {
+      "totalOrders": 7200,
+      "onTimeOrders": 4680,
+      "avgDeliveryDays": 5,
+      "cutoffHour": 18
+    }
+  },
+  {
+    "id": "b4",
+    "name": "Sapphire",
+    "deliveryStats": {
+      "totalOrders": 5500,
+      "onTimeOrders": 5335,
+      "avgDeliveryDays": 2,
+      "cutoffHour": 22
+    }
+  }
+]
