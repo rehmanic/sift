@@ -1,5 +1,3 @@
-# Sift — Purchase Confidence for LAAM
-
 ## 1. Problem Understanding
 
 Customers on LAAM browse many similar fashion products but drop off before purchasing because they can't quickly answer basic questions: Is my size in stock? What will I actually pay? Will it arrive on time? Are there better options?
@@ -87,6 +85,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 6. Tests
 
 - **Testing Strategy**: Manual end-to-end black-box testing was conducted across key user journeys (catalog filtering, PDP confidence scoring, user preference updates, and alternative product recommendations).
+- **Test Documentation**: Specific black-box test cases covering the Confidence Panel features are documented in [`tests/BLACKBOX.md`](tests/BLACKBOX.md).
 - **Rationale**: As a Proof of Concept (PoC) designed to validate user decision confidence and UX patterns, black-box testing was prioritized for rapid iteration over building unit test infrastructure.
 - **Priority Test Focus**: If implementing automated tests next, initial priority would be unit testing backend business logic in `productService.ts` (cross-brand size measurement matching, stacked pricing calculations, and alternative recommendation filtering) to prevent core scoring regressions.
 

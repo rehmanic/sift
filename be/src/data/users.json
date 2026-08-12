@@ -5,12 +5,12 @@
     "preferences": {
       "easternSize": {
         "waistCoat": {
-          "ban": 16.5,
-          "chest": 21,
-          "hips": 21,
-          "shoulder": 17,
-          "waist": 20,
-          "waistcoat length": 29
+          "ban": 16,
+          "chest": 44,
+          "hips": 44,
+          "shoulder": 20,
+          "waist": 40,
+          "waistcoat length": 28
         },
         "kurta": {
           "ban": 16.5,
