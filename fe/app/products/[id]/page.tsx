@@ -18,10 +18,12 @@ import {
   ThumbsUp,
   Plus,
   Minus,
+  Check,
 } from "lucide-react";
 import type { Product, Brand, ConfidenceResponse, Alternative } from "@/types/types";
 import { getProduct, getBrand, getConfidence, getAlternatives } from "@/lib/api";
 import { usePreferences } from "@/lib/UserPreferencesContext";
+import { calculateDiscountInfo } from "@/lib/priceCalculator";
 import HeaderNav from "@/components/HeaderNav";
 import SidebarNav from "@/components/SidebarNav";
 import SizeSelector from "@/components/SizeSelector";
@@ -122,14 +124,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   }
 
   // Calculate prices
-  let finalPrice = product.basePrice;
-  for (const d of product.discounts) {
-    finalPrice -= d.type === "percentage" ? Math.round(finalPrice * (d.value / 100)) : d.value;
-  }
-  const discountPct =
-    finalPrice < product.basePrice
-      ? Math.round(((product.basePrice - finalPrice) / product.basePrice) * 100)
-      : 0;
+  const { finalPrice, discountPct } = calculateDiscountInfo(product);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

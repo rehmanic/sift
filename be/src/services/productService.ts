@@ -10,7 +10,7 @@ import {
 } from "../types";
 import * as brandService from "./brandService";
 
-const productsData = products as Product[];
+const productsData = products as unknown as Product[];
 
 const SIZE_LABELS: SizeLabel[] = ["S", "M", "L", "XL", "XXL"];
 
@@ -42,16 +42,11 @@ export function getCategories(): string[] {
   return [...new Set(productsData.map((p) => p.category))];
 }
 
-/**
- * Find the best matching size label for a user based on their chest measurement
- * from the matching category in their eastern size preferences.
- */
 function findBestSize(product: Product, user: User): SizeLabel {
   const cat = (product.category || "").toLowerCase();
   const eastern = user.preferences?.easternSize;
 
-  // Try to get user's chest measurement from the matching category
-  let userChest = 38; // fallback default
+  let userChest = 38;
   if (eastern) {
     if (cat.includes("waist coat") && eastern.waistCoat?.chest) {
       userChest = eastern.waistCoat.chest;
@@ -78,8 +73,6 @@ function findBestSize(product: Product, user: User): SizeLabel {
 }
 
 function getStockStatus(_size: SizeLabel): StockStatus {
-  // With the new data model there's no per-size stock tracking,
-  // so we default to in_stock. This can be extended later.
   return "in_stock";
 }
 
@@ -199,7 +192,7 @@ export function getConfidence(
   const availability = {
     status,
     matchedSize,
-    stock: 10, // placeholder since per-size stock isn't tracked in new model
+    stock: 10,
     restockDate: null,
   };
 

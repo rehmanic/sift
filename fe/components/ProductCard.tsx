@@ -6,19 +6,7 @@ import { Heart, ShoppingBag, Star } from "lucide-react";
 import type { Product } from "@/types/types";
 import { Badge } from "@/components/ui/badge";
 
-function getFinalPrice(product: Product): number {
-  let price = product.basePrice;
-  for (const d of product.discounts) {
-    price -= d.type === "percentage" ? Math.round(price * (d.value / 100)) : d.value;
-  }
-  return price;
-}
-
-function getDiscountPercentage(product: Product): number {
-  const finalPrice = getFinalPrice(product);
-  if (finalPrice >= product.basePrice) return 0;
-  return Math.round(((product.basePrice - finalPrice) / product.basePrice) * 100);
-}
+import { calculateDiscountInfo } from "@/lib/priceCalculator";
 
 export default function ProductCard({
   product,
@@ -28,8 +16,8 @@ export default function ProductCard({
   brandName: string;
 }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const finalPrice = getFinalPrice(product);
-  const discountPct = getDiscountPercentage(product);
+  
+  const { finalPrice, discountPct } = calculateDiscountInfo(product);
   const hasDiscount = discountPct > 0;
 
   return (

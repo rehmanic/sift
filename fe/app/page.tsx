@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import PriceFilterDropdown from "@/components/PriceFilterDropdown";
 import FilterDropdown from "@/components/FilterDropdown";
 import { Skeleton } from "@/components/ui/skeleton";
+import { calculateDiscountInfo } from "@/lib/priceCalculator";
 
 const SIZE_LABELS: SizeLabel[] = ["S", "M", "L", "XL", "XXL"];
 
@@ -59,12 +60,7 @@ export default function Home() {
         return false;
       }
       // Price filter
-      let finalPrice = p.basePrice;
-      if (p.discounts && p.discounts.length > 0) {
-        for (const d of p.discounts) {
-          finalPrice -= d.type === "percentage" ? Math.round(finalPrice * (d.value / 100)) : d.value;
-        }
-      }
+      const { finalPrice } = calculateDiscountInfo(p);
       if (finalPrice < priceRange[0] || finalPrice > priceRange[1]) {
         return false;
       }

@@ -1,4 +1,3 @@
-/** Size values per label (S, M, L, XL, XXL) in inches */
 export interface SizeValues {
   S: number;
   M: number;
@@ -7,17 +6,13 @@ export interface SizeValues {
   XXL: number;
 }
 
-/**
- * Product sizes — each key is a measurement name (e.g. "ban", "chest",
- * "waistcoat length") and maps to per-size values.
- */
 export interface ProductSizes {
   ban: SizeValues;
   chest: SizeValues;
   hips: SizeValues;
   shoulder: SizeValues;
   waist: SizeValues;
-  [key: string]: SizeValues; // allows category-specific length keys
+  [key: string]: SizeValues;
 }
 
 export interface Discount {

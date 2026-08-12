@@ -10,11 +10,6 @@ export function getById(id: string): User | undefined {
   return users.find((u) => u.id === id);
 }
 
-/**
- * Deep merge utility — merges source into target recursively so that
- * nested category objects (waistCoat, kurta, etc.) are properly merged
- * rather than replaced entirely.
- */
 function deepMerge(target: any, source: any): any {
   const result = { ...target };
   for (const key of Object.keys(source)) {

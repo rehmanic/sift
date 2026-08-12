@@ -16,7 +16,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sift — LAAM Purchase Confidence",
+  title: "Sift",
   description:
     "Make confident purchase decisions on LAAM. Check availability, pricing, delivery, and alternatives at a glance.",
   icons: {
