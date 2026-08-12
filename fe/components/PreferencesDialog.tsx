@@ -17,39 +17,161 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { usePreferences } from "@/lib/UserPreferencesContext";
-import type { UserPreferences, WesternSizePreferences, EasternSizePreferences } from "@/types/types";
-import { Shirt, Scissors, CreditCard } from "lucide-react";
+import type {
+  UserPreferences,
+  EasternSizePreferences,
+  WaistCoatSize,
+  KurtaSize,
+  TrouserSize,
+  KameezSize,
+  ShalwarSize,
+} from "@/types/types";
+import { Scissors, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/* Payment & Delivery Options                                          */
+/* ------------------------------------------------------------------ */
 
 const PAYMENT_TYPES = [
   { value: "card", label: "Credit / Debit Card" },
-  { value: "cash", label: "Cash on Delivery (COD)" },
-  { value: "ewallet", label: "E-Wallet (JazzCash / EasyPaisa)" },
-];
-const DELIVERY_TYPES = [
-  { value: "standard", label: "Standard Delivery (2-3 Days)" },
-  { value: "instant", label: "Instant / Express Delivery" },
+  { value: "bank_transfer", label: "Bank Transfer" },
+  { value: "easypaisa", label: "Easypaisa" },
 ];
 
-const defaultWestern: WesternSizePreferences = {
-  chest: 34,
-  waist: 28,
-  hip: 36,
-  shoulder: 14.5,
+const DELIVERY_TYPES = [
+  { value: "standard", label: "Standard" },
+  { value: "instant", label: "Instant" },
+];
+
+/* ------------------------------------------------------------------ */
+/* Default Values                                                      */
+/* ------------------------------------------------------------------ */
+
+const defaultWaistCoat: WaistCoatSize = {
+  ban: 17.5,
+  chest: 21,
+  hips: 21,
+  shoulder: 17,
+  waist: 20,
+  "waistcoat length": 29,
+};
+
+const defaultKurta: KurtaSize = {
+  ban: 17.5,
+  chest: 24,
+  collar: 16,
+  length: 41,
+  shoulder: 18.5,
+  "sleeve length": 24,
+};
+
+const defaultTrouser: TrouserSize = {
+  length: 41,
+};
+
+const defaultKameez: KameezSize = {
+  ban: 17.5,
+  chest: 24,
+  collar: 16,
+  length: 41,
+  shoulder: 18.5,
+  "sleeve length": 24,
+};
+
+const defaultShalwar: ShalwarSize = {
+  length: 41,
 };
 
 const defaultEastern: EasternSizePreferences = {
-  kameezLength: 39,
-  chest: 36,
-  shoulder: 14,
-  sleeveLength: 21.5,
-  trouserLength: 38,
+  waistCoat: { ...defaultWaistCoat },
+  kurta: { ...defaultKurta },
+  trouser: { ...defaultTrouser },
+  kameez: { ...defaultKameez },
+  shalwar: { ...defaultShalwar },
 };
+
+/* ------------------------------------------------------------------ */
+/* Helper: Measurement Input Field (Strict 2-Word Labels)             */
+/* ------------------------------------------------------------------ */
+
+function MeasurementInput({
+  label,
+  value,
+  onChange,
+  step = 0.5,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  step?: number;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold text-muted-foreground block">{label}</label>
+      <div className="relative">
+        <input
+          type="number"
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring pr-14 font-medium"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium pointer-events-none">
+          inches
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Helper: Category Accordion Section                                  */
+/* ------------------------------------------------------------------ */
+
+function CategorySection({
+  title,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+      >
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+        {isOpen ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+      {isOpen && (
+        <div className="p-4 border-t border-border bg-background">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Main Component                                                      */
+/* ------------------------------------------------------------------ */
 
 export default function PreferencesDialog({ children }: { children: React.ReactNode }) {
   const { user, updatePreferences } = usePreferences();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"western" | "eastern" | "payment">("western");
+  const [activeTab, setActiveTab] = useState<"eastern" | "payment">("eastern");
+  const [expandedCategory, setExpandedCategory] = useState<string>("waistCoat");
 
   const [form, setForm] = useState<Partial<UserPreferences>>({});
 
@@ -59,8 +181,9 @@ export default function PreferencesDialog({ children }: { children: React.ReactN
     setOpen(isOpen);
     if (isOpen) {
       setForm({
-        westernSize: prefs?.westernSize ? { ...prefs.westernSize } : { ...defaultWestern },
-        easternSize: prefs?.easternSize ? { ...prefs.easternSize } : { ...defaultEastern },
+        easternSize: prefs?.easternSize
+          ? JSON.parse(JSON.stringify(prefs.easternSize))
+          : JSON.parse(JSON.stringify(defaultEastern)),
         paymentType: prefs?.paymentType ?? "card",
         deliveryType: prefs?.deliveryType ?? "standard",
       });
@@ -74,54 +197,48 @@ export default function PreferencesDialog({ children }: { children: React.ReactN
     setOpen(false);
   };
 
-  const updateWestern = (key: keyof WesternSizePreferences, val: any) => {
-    setForm((prev) => ({
-      ...prev,
-      westernSize: {
-        ...(prev.westernSize || defaultWestern),
-        [key]: val,
-      },
-    }));
-  };
+  /* --- Eastern size updaters --- */
 
-  const updateEastern = (key: keyof EasternSizePreferences, val: any) => {
-    setForm((prev) => ({
-      ...prev,
-      easternSize: {
-        ...(prev.easternSize || defaultEastern),
-        [key]: val,
-      },
-    }));
-  };
-
-  const western = form.westernSize || defaultWestern;
   const eastern = form.easternSize || defaultEastern;
+
+  const updateCategoryField = (
+    category: keyof EasternSizePreferences,
+    field: string,
+    value: number
+  ) => {
+    setForm((prev) => {
+      const currentEastern = prev.easternSize || { ...defaultEastern };
+      const currentCat = currentEastern[category] as Record<string, number>;
+      return {
+        ...prev,
+        easternSize: {
+          ...currentEastern,
+          [category]: {
+            ...currentCat,
+            [field]: value,
+          },
+        },
+      };
+    });
+  };
+
+  const toggleCategory = (cat: string) => {
+    setExpandedCategory(expandedCategory === cat ? "" : cat);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger render={children as React.ReactElement} />
       <DialogContent className="sm:max-w-xl md:max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
         <DialogHeader className="pb-2">
-          <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight">Shopping & Fit Preferences</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight">Shopping Preferences</DialogTitle>
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-            Configure your exact body & garment measurements. Best size tags are determined automatically by comparing your measurements against each product's size chart.
+            Configure your garment measurements and shopping options.
           </p>
         </DialogHeader>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation — 2 tabs only */}
         <div className="flex border-b border-border mt-2 space-x-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("western")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "western"
-                ? "border-primary text-foreground font-semibold"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Shirt className="h-4 w-4" />
-            Western Sizes
-          </button>
           <button
             type="button"
             onClick={() => setActiveTab("eastern")}
@@ -149,144 +266,197 @@ export default function PreferencesDialog({ children }: { children: React.ReactN
         </div>
 
         <div className="py-4">
-          {/* TAB 1: WESTERN CLOTHES SIZES */}
-          {activeTab === "western" && (
-            <div className="space-y-6 text-sm">
-              <div>
-                <p className="font-semibold text-foreground mb-3 text-sm">Body / Garment Measurements (in inches)</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Chest / Bust</label>
-                    <input
-                      type="number"
-                      value={western.chest ?? 34}
-                      onChange={(e) => updateWestern("chest", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Waist</label>
-                    <input
-                      type="number"
-                      value={western.waist ?? 28}
-                      onChange={(e) => updateWestern("waist", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Hip</label>
-                    <input
-                      type="number"
-                      value={western.hip ?? 36}
-                      onChange={(e) => updateWestern("hip", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Shoulder Width</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={western.shoulder ?? 14.5}
-                      onChange={(e) => updateWestern("shoulder", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: EASTERN CLOTHES SIZES */}
+          {/* TAB 1: EASTERN SIZES — per-category accordions */}
           {activeTab === "eastern" && (
-            <div className="space-y-6 text-sm">
-              <div>
-                <p className="font-semibold text-foreground mb-3 text-sm">Suit / Kameez / Trouser Size Chart (in inches)</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Shirt / Kameez Length</label>
-                    <input
-                      type="number"
-                      value={eastern.kameezLength ?? 39}
-                      onChange={(e) => updateEastern("kameezLength", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Chest / Bust</label>
-                    <input
-                      type="number"
-                      value={eastern.chest ?? 36}
-                      onChange={(e) => updateEastern("chest", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Shoulder</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={eastern.shoulder ?? 14}
-                      onChange={(e) => updateEastern("shoulder", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Sleeve Length</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={eastern.sleeveLength ?? 21.5}
-                      onChange={(e) => updateEastern("sleeveLength", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <div className="col-span-1 sm:col-span-2 space-y-1.5">
-                    <label className="text-sm font-medium text-muted-foreground">Trouser / Shalwar Length</label>
-                    <input
-                      type="number"
-                      value={eastern.trouserLength ?? 38}
-                      onChange={(e) => updateEastern("trouserLength", Number(e.target.value))}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3.5 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
+            <div className="space-y-3">
+              {/* Waist Coat */}
+              <CategorySection
+                title="Waist Coat"
+                isOpen={expandedCategory === "waistCoat"}
+                onToggle={() => toggleCategory("waistCoat")}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <MeasurementInput
+                    label="Ban Size"
+                    value={eastern.waistCoat?.ban ?? defaultWaistCoat.ban}
+                    onChange={(v) => updateCategoryField("waistCoat", "ban", v)}
+                  />
+                  <MeasurementInput
+                    label="Chest Size"
+                    value={eastern.waistCoat?.chest ?? defaultWaistCoat.chest}
+                    onChange={(v) => updateCategoryField("waistCoat", "chest", v)}
+                  />
+                  <MeasurementInput
+                    label="Hips Size"
+                    value={eastern.waistCoat?.hips ?? defaultWaistCoat.hips}
+                    onChange={(v) => updateCategoryField("waistCoat", "hips", v)}
+                  />
+                  <MeasurementInput
+                    label="Shoulder Width"
+                    value={eastern.waistCoat?.shoulder ?? defaultWaistCoat.shoulder}
+                    onChange={(v) => updateCategoryField("waistCoat", "shoulder", v)}
+                  />
+                  <MeasurementInput
+                    label="Waist Size"
+                    value={eastern.waistCoat?.waist ?? defaultWaistCoat.waist}
+                    onChange={(v) => updateCategoryField("waistCoat", "waist", v)}
+                  />
+                  <MeasurementInput
+                    label="Waistcoat Length"
+                    value={eastern.waistCoat?.["waistcoat length"] ?? defaultWaistCoat["waistcoat length"]}
+                    onChange={(v) => updateCategoryField("waistCoat", "waistcoat length", v)}
+                  />
                 </div>
-              </div>
+              </CategorySection>
+
+              {/* Kurta */}
+              <CategorySection
+                title="Kurta"
+                isOpen={expandedCategory === "kurta"}
+                onToggle={() => toggleCategory("kurta")}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <MeasurementInput
+                    label="Ban Size"
+                    value={eastern.kurta?.ban ?? defaultKurta.ban}
+                    onChange={(v) => updateCategoryField("kurta", "ban", v)}
+                  />
+                  <MeasurementInput
+                    label="Chest Size"
+                    value={eastern.kurta?.chest ?? defaultKurta.chest}
+                    onChange={(v) => updateCategoryField("kurta", "chest", v)}
+                  />
+                  <MeasurementInput
+                    label="Collar Size"
+                    value={eastern.kurta?.collar ?? defaultKurta.collar}
+                    onChange={(v) => updateCategoryField("kurta", "collar", v)}
+                  />
+                  <MeasurementInput
+                    label="Kurta Length"
+                    value={eastern.kurta?.length ?? defaultKurta.length}
+                    onChange={(v) => updateCategoryField("kurta", "length", v)}
+                  />
+                  <MeasurementInput
+                    label="Shoulder Width"
+                    value={eastern.kurta?.shoulder ?? defaultKurta.shoulder}
+                    onChange={(v) => updateCategoryField("kurta", "shoulder", v)}
+                  />
+                  <MeasurementInput
+                    label="Sleeve Length"
+                    value={eastern.kurta?.["sleeve length"] ?? defaultKurta["sleeve length"]}
+                    onChange={(v) => updateCategoryField("kurta", "sleeve length", v)}
+                  />
+                </div>
+              </CategorySection>
+
+              {/* Trouser */}
+              <CategorySection
+                title="Trouser"
+                isOpen={expandedCategory === "trouser"}
+                onToggle={() => toggleCategory("trouser")}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <MeasurementInput
+                    label="Trouser Length"
+                    value={eastern.trouser?.length ?? defaultTrouser.length}
+                    onChange={(v) => updateCategoryField("trouser", "length", v)}
+                  />
+                </div>
+              </CategorySection>
+
+              {/* Kameez */}
+              <CategorySection
+                title="Kameez"
+                isOpen={expandedCategory === "kameez"}
+                onToggle={() => toggleCategory("kameez")}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <MeasurementInput
+                    label="Ban Size"
+                    value={eastern.kameez?.ban ?? defaultKameez.ban}
+                    onChange={(v) => updateCategoryField("kameez", "ban", v)}
+                  />
+                  <MeasurementInput
+                    label="Chest Size"
+                    value={eastern.kameez?.chest ?? defaultKameez.chest}
+                    onChange={(v) => updateCategoryField("kameez", "chest", v)}
+                  />
+                  <MeasurementInput
+                    label="Collar Size"
+                    value={eastern.kameez?.collar ?? defaultKameez.collar}
+                    onChange={(v) => updateCategoryField("kameez", "collar", v)}
+                  />
+                  <MeasurementInput
+                    label="Kameez Length"
+                    value={eastern.kameez?.length ?? defaultKameez.length}
+                    onChange={(v) => updateCategoryField("kameez", "length", v)}
+                  />
+                  <MeasurementInput
+                    label="Shoulder Width"
+                    value={eastern.kameez?.shoulder ?? defaultKameez.shoulder}
+                    onChange={(v) => updateCategoryField("kameez", "shoulder", v)}
+                  />
+                  <MeasurementInput
+                    label="Sleeve Length"
+                    value={eastern.kameez?.["sleeve length"] ?? defaultKameez["sleeve length"]}
+                    onChange={(v) => updateCategoryField("kameez", "sleeve length", v)}
+                  />
+                </div>
+              </CategorySection>
+
+              {/* Shalwar */}
+              <CategorySection
+                title="Shalwar"
+                isOpen={expandedCategory === "shalwar"}
+                onToggle={() => toggleCategory("shalwar")}
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <MeasurementInput
+                    label="Shalwar Length"
+                    value={eastern.shalwar?.length ?? defaultShalwar.length}
+                    onChange={(v) => updateCategoryField("shalwar", "length", v)}
+                  />
+                </div>
+              </CategorySection>
             </div>
           )}
 
-          {/* TAB 3: PAYMENT & DELIVERY */}
+          {/* TAB 2: PAYMENT & DELIVERY */}
           {activeTab === "payment" && (
             <div className="space-y-6 text-sm">
               <div className="space-y-2">
-                <label className="font-semibold text-foreground text-sm">Payment Method</label>
+                <label className="text-xs font-semibold text-muted-foreground block">Payment Method</label>
                 <Select
                   value={form.paymentType ?? "card"}
-                  onValueChange={(v) => setForm({ ...form, paymentType: v as UserPreferences["paymentType"] })}
+                  onValueChange={(v) => setForm({ ...form, paymentType: v as any })}
                 >
-                  <SelectTrigger className="h-10 text-sm">
-                    <SelectValue placeholder="Select payment method" />
+                  <SelectTrigger className="h-10 text-sm font-medium">
+                    <SelectValue placeholder="Select payment">
+                      {(val) => PAYMENT_TYPES.find((p) => p.value === val)?.label || val}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {PAYMENT_TYPES.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      <SelectItem key={p.value} value={p.value} label={p.label}>{p.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <label className="font-semibold text-foreground text-sm">Delivery Speed</label>
+                <label className="text-xs font-semibold text-muted-foreground block">Delivery Speed</label>
                 <Select
                   value={form.deliveryType ?? "standard"}
-                  onValueChange={(v) => setForm({ ...form, deliveryType: v as UserPreferences["deliveryType"] })}
+                  onValueChange={(v) => setForm({ ...form, deliveryType: v as any })}
                 >
-                  <SelectTrigger className="h-10 text-sm">
-                    <SelectValue placeholder="Select delivery type" />
+                  <SelectTrigger className="h-10 text-sm font-medium">
+                    <SelectValue placeholder="Select delivery">
+                      {(val) => DELIVERY_TYPES.find((d) => d.value === val)?.label || val}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {DELIVERY_TYPES.map((d) => (
-                      <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      <SelectItem key={d.value} value={d.value} label={d.label}>{d.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

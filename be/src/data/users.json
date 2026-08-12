@@ -1,25 +1,42 @@
 [
   {
     "id": "u1",
-    "name": "Ayesha Khan",
+    "name": "Abdur Rehman",
     "preferences": {
-      "westernSize": {
-        "sizeLabel": "S",
-        "chest": 34,
-        "waist": 28,
-        "hip": 36,
-        "shoulder": 14.5
-      },
       "easternSize": {
-        "sizeLabel": "S",
-        "kameezLength": 39,
-        "chest": 36,
-        "shoulder": 14,
-        "sleeveLength": 21.5,
-        "trouserLength": 38
+        "waistCoat": {
+          "ban": 16.5,
+          "chest": 21,
+          "hips": 21,
+          "shoulder": 17,
+          "waist": 20,
+          "waistcoat length": 29
+        },
+        "kurta": {
+          "ban": 16.5,
+          "chest": 24,
+          "collar": 16,
+          "length": 41,
+          "shoulder": 18.5,
+          "sleeve length": 24
+        },
+        "trouser": {
+          "length": 41
+        },
+        "kameez": {
+          "ban": 17.5,
+          "chest": 24,
+          "collar": 16,
+          "length": 41,
+          "shoulder": 18.5,
+          "sleeve length": 24
+        },
+        "shalwar": {
+          "length": 41
+        }
       },
-      "paymentType": "card",
-      "deliveryType": "standard"
+      "paymentType": "easypaisa",
+      "deliveryType": "instant"
     }
   }
 ]

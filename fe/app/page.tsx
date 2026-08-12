@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import type { Product, Brand } from "@/types/types";
+import type { Product, Brand, SizeLabel } from "@/types/types";
 import { getProducts, getBrand } from "@/lib/api";
 import HeaderNav from "@/components/HeaderNav";
 import ProductCard from "@/components/ProductCard";
 import PriceFilterDropdown from "@/components/PriceFilterDropdown";
+import FilterDropdown from "@/components/FilterDropdown";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
-import { ChevronDown } from "lucide-react";
+
+const SIZE_LABELS: SizeLabel[] = ["S", "M", "L", "XL", "XXL"];
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,8 +17,6 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedColor, setSelectedColor] = useState<string>("");
-  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 15000]);
   const [loading, setLoading] = useState(true);
 
@@ -38,26 +37,12 @@ export default function Home() {
   }, []);
 
   const categories = [
-    "Shalwar Kameez",
-    "Kurta set",
-    "Sherwani",
-    "Prince coat",
-    "Unstitched",
+    "Waist Coat",
     "Kurta",
+    "Trouser",
+    "Kameez",
     "Shalwar",
-    "Trousers",
   ];
-
-  // Dynamically extract colors from products
-  const availableColors = useMemo(() => {
-    const colors = new Set<string>();
-    products.forEach((p) => {
-      p.variants.forEach((v) => {
-        if (v.color) colors.add(v.color);
-      });
-    });
-    return Array.from(colors);
-  }, [products]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -73,24 +58,6 @@ export default function Home() {
       if (selectedBrand && p.brandId !== selectedBrand) {
         return false;
       }
-      // Size filter
-      if (
-        selectedSize &&
-        !p.variants.some((v) => v.size === selectedSize && (inStockOnly ? v.stock > 0 : true))
-      ) {
-        return false;
-      }
-      // Color filter
-      if (
-        selectedColor &&
-        !p.variants.some((v) => v.color.toLowerCase() === selectedColor.toLowerCase())
-      ) {
-        return false;
-      }
-      // In-stock filter
-      if (inStockOnly && !p.variants.some((v) => v.stock > 0)) {
-        return false;
-      }
       // Price filter
       let finalPrice = p.basePrice;
       if (p.discounts && p.discounts.length > 0) {
@@ -103,7 +70,7 @@ export default function Home() {
       }
       return true;
     });
-  }, [products, selectedCategory, selectedBrand, selectedSize, selectedColor, inStockOnly, priceRange]);
+  }, [products, selectedCategory, selectedBrand, selectedSize, priceRange]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -121,7 +88,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Categories Pills: Shalwar Kameez, Kurta set, Sherwani, Prince coat, Unstitched, Kurta, Shalwar, Trousers */}
+        {/* Categories Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           <button
             onClick={() => setSelectedCategory("")}
@@ -148,76 +115,30 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Explicit Filter Row: In-stock, Price, Size, Brand, Color */}
+        {/* Explicit Filter Row: Price, Size, Brand */}
         <div className="flex flex-wrap items-center gap-3 py-3 border-y border-border text-xs">
-          {/* 1. In-stock Filter */}
-          <label className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5 cursor-pointer hover:bg-muted transition-colors">
-            <span className="font-semibold text-foreground">In-stock</span>
-            <input
-              type="checkbox"
-              checked={inStockOnly}
-              onChange={(e) => setInStockOnly(e.target.checked)}
-              className="accent-foreground rounded cursor-pointer h-3.5 w-3.5"
-            />
-          </label>
-
-          {/* 2. Price Filter Popover */}
+          {/* 1. Price Filter Popover */}
           <PriceFilterDropdown
             priceRange={priceRange}
             onApply={setPriceRange}
             maxPriceLimit={15000}
           />
 
-          {/* 3. Size Filter */}
-          <div className="relative inline-block">
-            <select
-              value={selectedSize}
-              onChange={(e) => setSelectedSize(e.target.value)}
-              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
-            >
-              <option value="">Size: All</option>
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-            </select>
-            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
-          </div>
+          {/* 2. Size Filter */}
+          <FilterDropdown
+            label="Size: All"
+            options={SIZE_LABELS.map((size) => ({ label: size, value: size }))}
+            value={selectedSize}
+            onChange={setSelectedSize}
+          />
 
-          {/* 4. Brand Filter */}
-          <div className="relative inline-block">
-            <select
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
-            >
-              <option value="">Brand: All</option>
-              {Object.values(brands).map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
-          </div>
-
-          {/* 5. Color Filter */}
-          <div className="relative inline-block">
-            <select
-              value={selectedColor}
-              onChange={(e) => setSelectedColor(e.target.value)}
-              className="appearance-none bg-background border border-border rounded-md px-3 py-1.5 pr-7 text-xs font-semibold cursor-pointer focus:outline-none focus:border-foreground"
-            >
-              <option value="">Color: All</option>
-              {availableColors.map((col) => (
-                <option key={col} value={col}>
-                  {col}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="h-3 w-3 absolute right-2 top-2.5 pointer-events-none text-muted-foreground" />
-          </div>
+          {/* 3. Brand Filter */}
+          <FilterDropdown
+            label="Brand: All"
+            options={Object.values(brands).map((b) => ({ label: b.name, value: b.id }))}
+            value={selectedBrand}
+            onChange={setSelectedBrand}
+          />
         </div>
 
         {/* Product Grid */}

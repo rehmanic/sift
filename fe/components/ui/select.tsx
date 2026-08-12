@@ -30,9 +30,10 @@ function SelectTrigger({
 
 function SelectValue({
   placeholder,
+  children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value> & { placeholder?: string }) {
-  return <SelectPrimitive.Value {...props} placeholder={placeholder} />
+  return <SelectPrimitive.Value {...props} placeholder={placeholder}>{children}</SelectPrimitive.Value>
 }
 
 function SelectContent({
@@ -42,10 +43,15 @@ function SelectContent({
 }: React.ComponentProps<typeof SelectPrimitive.Popup>) {
   return (
     <SelectPrimitive.Portal>
-      <SelectPrimitive.Positioner sideOffset={4}>
+      <SelectPrimitive.Positioner
+        side="bottom"
+        alignItemWithTrigger={false}
+        sideOffset={6}
+        className="z-[99999] w-[var(--anchor-width)]"
+      >
         <SelectPrimitive.Popup
           className={cn(
-            "z-50 min-w-[8rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity duration-150",
+            "z-[99999] w-full min-w-[var(--anchor-width)] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity duration-150",
             className
           )}
           {...props}

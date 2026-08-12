@@ -17,7 +17,7 @@ export default function SidebarNav({ activeCategory, onSelectCategory }: Sidebar
     { label: "New In", value: "New In" },
   ];
 
-  const menSub = ["Lawn Kurta", "Silk Kurta", "Chiffon Dupatta", "Clothing", "Footwear", "Accessories"];
+  const menSub = ["Waist Coat", "Kurta", "Trouser", "Kameez", "Shalwar"];
 
   const secondaryNav = [
     "Beauty",
@@ -92,7 +92,7 @@ export default function SidebarNav({ activeCategory, onSelectCategory }: Sidebar
             {menSub.map((sub) => (
               <button
                 key={sub}
-                onClick={() => onSelectCategory(sub === "Clothing" || sub === "Footwear" || sub === "Accessories" ? "" : sub)}
+                onClick={() => onSelectCategory(sub)}
                 className={`w-full text-left px-3 py-1.5 rounded transition-colors ${
                   activeCategory === sub
                     ? "font-bold text-foreground bg-muted"

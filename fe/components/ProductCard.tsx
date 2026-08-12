@@ -6,13 +6,6 @@ import { Heart, ShoppingBag, Star } from "lucide-react";
 import type { Product } from "@/types/types";
 import { Badge } from "@/components/ui/badge";
 
-function getLowestStockStatus(product: Product) {
-  const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
-  if (totalStock === 0) return "out_of_stock" as const;
-  if (totalStock <= 5) return "low_stock" as const;
-  return "in_stock" as const;
-}
-
 function getFinalPrice(product: Product): number {
   let price = product.basePrice;
   for (const d of product.discounts) {
@@ -35,7 +28,6 @@ export default function ProductCard({
   brandName: string;
 }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const status = getLowestStockStatus(product);
   const finalPrice = getFinalPrice(product);
   const discountPct = getDiscountPercentage(product);
   const hasDiscount = discountPct > 0;
@@ -68,16 +60,10 @@ export default function ProductCard({
         </Link>
 
         {/* Top-Left Discount Badge */}
-        {hasDiscount ? (
+        {hasDiscount && (
           <span className="absolute top-2.5 left-2.5 bg-emerald-700 text-white text-[11px] font-bold px-1.5 py-0.5 rounded">
             -{discountPct}%
           </span>
-        ) : (
-          status === "out_of_stock" && (
-            <span className="absolute top-2.5 left-2.5 bg-red-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded">
-              Out of Stock
-            </span>
-          )
         )}
 
         {/* Top-Right Wishlist Heart Icon */}

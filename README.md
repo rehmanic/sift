@@ -111,4 +111,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **What AI Helped Generate**: AI generated initial project scaffolding, directory layout, and boilerplate component structures to save setup time.
 - **What Was Manually Done**: Requirements analysis and solution brainstorming were performed 100% manually (documented in `BRAINSTORM.md`). All AI-generated code was reviewed, refactored, and tested manually.
 - **Correction / Rejection Example**: The initial AI boilerplate proposed an over-engineered enterprise architecture with superfluous abstraction layers. I rejected the extra boilerplate and refactored it into a clean, single-tier Express service architecture.
-- **Audit Trail**: Recorded automatically by Antigravity-IDE transcript logs (`.system_generated/logs/transcript.jsonl`).

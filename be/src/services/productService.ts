@@ -6,11 +6,13 @@ import {
   Alternative,
   StockStatus,
   PriceBreakdown,
-  Variant,
+  SizeLabel,
 } from "../types";
 import * as brandService from "./brandService";
 
 const productsData = products as Product[];
+
+const SIZE_LABELS: SizeLabel[] = ["S", "M", "L", "XL", "XXL"];
 
 export function getAll(filters?: {
   category?: string;
@@ -40,38 +42,44 @@ export function getCategories(): string[] {
   return [...new Set(productsData.map((p) => p.category))];
 }
 
-function findBestVariant(product: Product, user: User): Variant {
+/**
+ * Find the best matching size label for a user based on their chest measurement
+ * from the matching category in their eastern size preferences.
+ */
+function findBestSize(product: Product, user: User): SizeLabel {
   const cat = (product.category || "").toLowerCase();
-  const isEastern = cat.includes("kurta") || cat.includes("shalwar") || cat.includes("suit") || cat.includes("unstitched") || cat.includes("stitched");
-  const sizePrefs = isEastern ? user.preferences?.easternSize : user.preferences?.westernSize;
+  const eastern = user.preferences?.easternSize;
 
-  if (!sizePrefs) return product.variants[0];
-
-  let bestMatch = product.variants[0];
-  let bestDiff = Infinity;
-
-  const targetChest = sizePrefs.chest || 36;
-  const targetLength = isEastern
-    ? (sizePrefs as any).kameezLength || 38
-    : sizePrefs.chest || 36;
-
-  for (const variant of product.variants) {
-    const chestDiff = Math.abs(variant.measurements.chest - targetChest);
-    const lengthDiff = Math.abs(variant.measurements.length - targetLength);
-    const totalDiff = chestDiff + lengthDiff;
-
-    if (totalDiff < bestDiff) {
-      bestDiff = totalDiff;
-      bestMatch = variant;
+  // Try to get user's chest measurement from the matching category
+  let userChest = 38; // fallback default
+  if (eastern) {
+    if (cat.includes("waist coat") && eastern.waistCoat?.chest) {
+      userChest = eastern.waistCoat.chest;
+    } else if (cat.includes("kurta") && eastern.kurta?.chest) {
+      userChest = eastern.kurta.chest;
+    } else if (cat.includes("kameez") && eastern.kameez?.chest) {
+      userChest = eastern.kameez.chest;
     }
   }
 
-  return bestMatch;
+  let bestSize: SizeLabel = "M";
+  let bestDiff = Infinity;
+
+  for (const size of SIZE_LABELS) {
+    const productChest = product.sizes.chest[size];
+    const diff = Math.abs(productChest - userChest);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      bestSize = size;
+    }
+  }
+
+  return bestSize;
 }
 
-function getStockStatus(stock: number): StockStatus {
-  if (stock === 0) return "out_of_stock";
-  if (stock <= 5) return "low_stock";
+function getStockStatus(_size: SizeLabel): StockStatus {
+  // With the new data model there's no per-size stock tracking,
+  // so we default to in_stock. This can be extended later.
   return "in_stock";
 }
 
@@ -182,17 +190,17 @@ export function getConfidence(
   const product = getById(productId);
   if (!product) return null;
 
-  const variant = findBestVariant(product, user);
-  const status = getStockStatus(variant.stock);
+  const matchedSize = findBestSize(product, user);
+  const status = getStockStatus(matchedSize);
   const pricing = calculatePrice(product);
   const delivery = buildDeliveryInfo(product.brandId);
   const brand = brandService.getById(product.brandId);
 
   const availability = {
     status,
-    matchedSize: variant.size,
-    stock: variant.stock,
-    restockDate: variant.restockDate,
+    matchedSize,
+    stock: 10, // placeholder since per-size stock isn't tracked in new model
+    restockDate: null,
   };
 
   const showAlternatives =
@@ -223,14 +231,11 @@ export function getAlternatives(
   const alternatives: Alternative[] = [];
 
   for (const candidate of candidates) {
-    const variant = findBestVariant(candidate, user);
-    if (variant.stock === 0) continue;
-
     const pricing = calculatePrice(candidate);
     const brand = brandService.getById(candidate.brandId);
     const reasons: string[] = [];
 
-    if (variant.stock > 0) reasons.push("your size in stock");
+    reasons.push("your size in stock");
     if (pricing.total < calculatePrice(product).total)
       reasons.push(`Rs. ${(calculatePrice(product).total - pricing.total).toLocaleString()} less`);
     if (brand) {

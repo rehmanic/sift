@@ -121,9 +121,6 @@ export default function ProductDetailPage({ params }: PageProps) {
     );
   }
 
-  const selectedVariant = product.variants.find((v) => v.size === selectedSize);
-  const isOutOfStock = selectedVariant?.stock === 0;
-
   // Calculate prices
   let finalPrice = product.basePrice;
   for (const d of product.discounts) {
@@ -261,7 +258,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
               {/* Size Selector */}
               <SizeSelector
-                variants={product.variants}
+                sizes={product.sizes}
                 selectedSize={selectedSize}
                 onSelect={setSelectedSize}
               />
@@ -288,22 +285,13 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  {isOutOfStock ? (
-                    <Button className="w-full gap-2 h-14 text-base font-bold rounded-xl" variant="outline">
-                      <Bell className="h-5 w-5" />
-                      Notify Me When Available
-                    </Button>
-                  ) : (
-                    <>
-                      <Button className="flex-1 h-14 bg-foreground text-background hover:bg-foreground/90 font-bold text-base rounded-xl shadow-sm">
-                        <ShoppingBag className="h-5 w-5 mr-2" />
-                        Add To Bag
-                      </Button>
-                      <Button className="flex-1 h-14 border-2 border-foreground bg-background text-foreground hover:bg-muted font-bold text-base rounded-xl shadow-sm">
-                        Buy Now
-                      </Button>
-                    </>
-                  )}
+                  <Button className="flex-1 h-14 bg-foreground text-background hover:bg-foreground/90 font-bold text-base rounded-xl shadow-sm">
+                    <ShoppingBag className="h-5 w-5 mr-2" />
+                    Add To Bag
+                  </Button>
+                  <Button className="flex-1 h-14 border-2 border-foreground bg-background text-foreground hover:bg-muted font-bold text-base rounded-xl shadow-sm">
+                    Buy Now
+                  </Button>
                 </div>
               </div>
 
@@ -327,17 +315,17 @@ export default function ProductDetailPage({ params }: PageProps) {
                   <div className="space-y-3 pt-2 pb-1">
                     <div className="border border-border rounded-lg overflow-hidden text-xs">
                       <div className="grid grid-cols-2 divide-x divide-y divide-border">
-                        <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Color Type</div>
-                        <div className="p-2.5 font-medium">{product.variants[0]?.color || "Standard"}</div>
+                        <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Category</div>
+                        <div className="p-2.5 font-medium">{product.category}</div>
 
                         <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Product ID</div>
                         <div className="p-2.5 font-mono">{product.id.toUpperCase()}-2026</div>
 
                         <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Fabric</div>
-                        <div className="p-2.5 font-medium">{product.category.includes("Silk") ? "Pure Silk" : "Premium Wash & Wear"}</div>
+                        <div className="p-2.5 font-medium">Premium Wash & Wear</div>
 
                         <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Number of Pieces</div>
-                        <div className="p-2.5 font-medium">1 Piece - Kurta</div>
+                        <div className="p-2.5 font-medium">1 Piece - {product.category}</div>
 
                         <div className="p-2.5 bg-muted/40 font-semibold text-muted-foreground">Season</div>
                         <div className="p-2.5 font-medium">All Season Festive</div>
